@@ -2,45 +2,48 @@
 @{
     ViewData["Title"] = "Index";
 
-
+    @Html.ValidationMessage("Error")
     <link href="~/css/app.css" rel="stylesheet" />
     <div class="generic-container">
         <div class="panel panel-default">
             <div class="panel-heading"><span class="lead">User Registration Form </span></div>
             <div class="formcontainer">
-                <form class="form-horizontal"  method="post" asp-action="AddUser">
+                <form class="form-horizontal" method="post" asp-action="AddUser">
+                    <div asp-validation-summary="ModelOnly"></div>
 
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label for="FirstName">FirstName</label>
                             <input asp-for="userModel.FirstName" class="form-control" placeholder="FirstName">
+                            <span asp-validation-for="userModel.FirstName" class="text-danger"></span>
                         </div>
                         <div class="form-group col-md-6">
                             <label for="LastName">Surname</label>
                             <input asp-for="userModel.LastName" class="form-control" placeholder="Surname">
+                            <span asp-validation-for="userModel.LastName" class="text-danger"></span>
                         </div>
                     </div>
-
 
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label for="EmailAddress">Email</label>
                             <input asp-for="emailModel.EmailAddress" class="form-control" placeholder="Email Address">
+                            <span asp-validation-for="emailModel.EmailAddress" class="text-danger"></span>
                         </div>
                         <div class="form-group col-md-6">
                             <label for="ContactNumber">Cell Phone</label>
                             <input asp-for="contactModel.ContactNumber" class="form-control" placeholder="Cell Phone">
+                            <span asp-validation-for="contactModel.ContactNumber" class="text-danger"></span>
                         </div>
                     </div>
-
 
                     <div class="form-row">
                         <div class="form-group col-md-12">
                             <label for="Address">Address</label>
                             <input asp-for="userModel.Address" class="form-control" placeholder="Address">
+                            <span asp-validation-for="userModel.Address" class="text-danger"></span>
                         </div>
                     </div>
-
 
                     <div class="row">
                         <div class="form-actions floatRight">
@@ -55,7 +58,8 @@
             <!-- Default panel contents -->
             <div class="panel-heading"><span class="lead">List of Contact </span></div>
             <div class="tablecontainer">
-                <table class="table table-hover">
+                <input type="text" id="myInput" onkeyup="SearchContact()" placeholder="Search for names.." title="Type in a name">
+                <table id="contactTb" class="table table-hover">
                     <thead>
                         <tr>
                             <th>ID.</th>
@@ -78,7 +82,8 @@
                                 <td><span>@item.Address</span></td>
                                 <td><span>@item.EmailAddress</span></td>
                                 <td>
-                                    <button type="button" class="btn btn-success custom-width">Edit</button>  <button type="button" class="btn btn-danger custom-width">Remove</button>
+                                    <a asp-controller="User" asp-action="Edit" class="btn btn-success custom-width" asp-route-Id="@item.UserId">Edit</a>
+                                    <a asp-controller="User" asp-action="DeleteContact" class="btn btn-danger custom-width" asp-route-Id="@item.UserId">Remove</a>
                                 </td>
                             </tr>
                         }
@@ -87,34 +92,40 @@
             </div>
         </div>
     </div>
+}
+
+
+<script>
+    function SearchContact() {
+
+        var input, filter, table, tr, td, i, txtValue;
+
+        input = document.getElementById("myInput");
+
+        filter = input.value.toUpperCase();
+
+        table = document.getElementById("contactTb");
+
+        tr = table.getElementsByTagName("tr");
+
+        for (i = 0; i < tr.length; i++) {
+
+            td = tr[i].getElementsByTagName("td")[1];
+
+            if (td) {
+
+                txtValue = td.textContent || td.innerText;
+
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+
+                    tr[i].style.display = "";
+
+                } else {
+
+                    tr[i].style.display = "none";
+
+                }
+            }
+        }
     }
-    @*<script src="<a class=" vglnk" href="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.4/angular.js" rel="nofollow"><span>https</span><span>://</span><span>ajax</span><span>.</span><span>googleapis</span><span>.</span><span>com</span><span>/</span><span>ajax</span><span>/</span><span>libs</span><span>/</span><span>angularjs</span><span>/</span><span>1</span><span>.</span><span>4</span><span>.</span><span>4</span><span>/</span><span>angular</span><span>.</span><span>js</span></a>"></script>
-        <script src="<c:url value='/static/js/app.js' />"></script>
-        <script src="<c:url value='/static/js/service/user_service.js' />"></script>
-        <script src="<c:url value='/static/js/controller/user_controller.js' />"></script>*@
-
-
-    @*<form method="post" asp-action="AddUser">
-            <div class="form-control">
-                <label>FirstName :</label>
-                <input asp-for="userModel.FirstName" />
-            </div>
-            <div class="form-control">
-                <label>LastName :</label>
-                <input asp-for="userModel.LastName" />
-            </div>
-            <div class="form-control">
-                <label>Address :</label>
-                <input asp-for="userModel.Address" />
-            </div>
-            <div class="form-control">
-                <label>Email Address :</label>
-                <input asp-for="emailModel.EmailAddress" />
-            </div>
-            <div class="form-control">
-                <label>Contact Number :</label>
-                <input asp-for="contactModel.ContactNumber" />
-            </div>
-            <br />
-            <input type="submit" />
-        </form>*@
+</script>
