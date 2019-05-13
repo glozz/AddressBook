@@ -51,7 +51,64 @@ namespace AddressBook.Controllers
             }
             return RedirectToAction("Index");
         }
-        public ActionResult Edit(int id)
+
+        [HttpPost]
+        public IActionResult AddContact(string userId, string contactNo)
+        {
+            var contactModel = new ContactModel()
+            {
+                UserId = Convert.ToInt16(userId),
+                ContactNumber = contactNo
+            };
+
+            _repository.SaveContact(contactModel, _context);
+           
+            return RedirectToAction("Index");
+        }
+
+
+        [HttpPost]
+        public ActionResult UpdateContact(string contactId, string contactNo)
+        {
+            var contactModel = new ContactModel()
+            {
+                ContactId = Convert.ToInt16(contactId),
+                ContactNumber = contactNo
+            };
+
+            _repository.UpdateContact(contactModel, _context);
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public IActionResult UpdateEmail(string emailId, string emailAddress)
+        {
+            var emailModel = new EmailModel()
+            {
+                EmailId = Convert.ToInt16(emailId),
+                EmailAddress = emailAddress
+            };
+
+            _repository.UpdateEmail(emailModel, _context);
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public IActionResult AddEmail(string userId, string emailAddress)
+        {
+            var contactModel = new EmailModel()
+            {
+                UserId = Convert.ToInt16(userId),
+                EmailAddress = emailAddress
+            };
+
+            _repository.SaveEmail(contactModel, _context);
+
+            return RedirectToAction("Index");
+        }
+        public ActionResult EditUserContact(int id)
         {
             UpdateModel model = new UpdateModel();
 
@@ -65,19 +122,14 @@ namespace AddressBook.Controllers
         }
 
         [HttpPost]
-        public ActionResult Edit(UpdateModel model)
+        public ActionResult EditUserContact(UpdateModel model)
         {
-            _repository.UpdateUserContact(model, _context);
+            _repository.UpdateUser(model.userModel, _context);
 
             return RedirectToAction("Index");
         }
-        [HttpPost]
-        public ActionResult EditContact(string id, string value)
-        {
-
-            return Ok();
-        }
-        public ActionResult DeleteContact(int id)
+    
+        public ActionResult DeleteUserContact(int id)
         {
             UpdateModel model = new UpdateModel();
 
@@ -90,8 +142,9 @@ namespace AddressBook.Controllers
 
             _repository.DeleteUser(id, _context);
 
-
-            return View(model);
+            return RedirectToAction("Index");
         }
+
+      
     }
 }

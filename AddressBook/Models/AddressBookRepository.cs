@@ -22,20 +22,20 @@ namespace AddressBook.Models
                       .Where(m => listofUsers.Contains(m.UserId))
                       .ToList();
 
-            var contactListModel = from user in currentUserContact
-                                   join contact in _context.Contact on user.UserId equals contact.UserId
-                                   join email in _context.Email on user.UserId equals email.UserId
-                                   select (new ContactListModel
-                                   {
-                                       UserId = user.UserId,
-                                       FirstName = user.FirstName,
-                                       LastName = user.LastName,
-                                       ContactNumber = contact.ContactNumber,
-                                       EmailAddress = email.EmailAddress,
-                                       Address = user.Address
-                                   });
+            var contactListModel = (from user in currentUserContact
+                                    join contact in _context.Contact on user.UserId equals contact.UserId
+                                    join email in _context.Email on user.UserId equals email.UserId
+                                    select (new ContactListModel
+                                    {
+                                        UserId = user.UserId,
+                                        FirstName = user.FirstName,
+                                        LastName = user.LastName,
+                                        ContactNumber = contact.ContactNumber,
+                                        EmailAddress = email.EmailAddress,
+                                        Address = user.Address
+                                    }));
 
-            return contactListModel.ToList();
+            return contactListModel.GroupBy(m => m.UserId).Select(m => m.FirstOrDefault()).ToList(); 
         }
 
         public UserModel GetUserById(int id, AddressBookContext _context)
@@ -101,22 +101,7 @@ namespace AddressBook.Models
             }
         }
 
-        public void UpdateUserContact(UpdateModel model, AddressBookContext _context)
-        {
-            UpdateUser(model.userModel, _context);
-
-            foreach (var item in model.contactModel)
-            {
-                UpdateContact(item, _context);
-            }
-
-            foreach (var item in model.emailModel)
-            {
-                UpdateEmail(item, _context);
-            }
-        }
-
-        private static void UpdateUser(UserModel model, AddressBookContext _context)
+        public void UpdateUser(UserModel model, AddressBookContext _context)
         {
             try
             {
@@ -136,7 +121,7 @@ namespace AddressBook.Models
 
         public void UpdateContact(ContactModel model, AddressBookContext _context)
         {
-            var contact = _context.Contact.Where(s => s.UserId == model.UserId).First();
+            var contact = _context.Contact.Where(s => s.ContactId == model.ContactId).First();
 
             contact.ContactNumber = model.ContactNumber;
             _context.Update(contact);
@@ -145,7 +130,8 @@ namespace AddressBook.Models
 
         public void UpdateEmail(EmailModel model, AddressBookContext _context)
         {
-            var email = _context.Email.Where(s => s.UserId == model.UserId).First();
+            var email = _context.Email.Where(s => s.EmailId == model.EmailId).First();
+            email.EmailAddress = model.EmailAddress;
             _context.Update(email);
             _context.SaveChanges();
         }
@@ -222,7 +208,7 @@ namespace AddressBook.Models
             }
         }
 
-        private void SaveContact(ContactModel model, AddressBookContext _context)
+        public void SaveContact(ContactModel model, AddressBookContext _context)
         {
             try
             {
@@ -235,7 +221,7 @@ namespace AddressBook.Models
             }
         }
 
-        private void SaveEmail(EmailModel model, AddressBookContext _context)
+        public void SaveEmail(EmailModel model, AddressBookContext _context)
         {
             try
             {

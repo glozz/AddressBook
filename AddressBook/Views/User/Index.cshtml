@@ -6,11 +6,10 @@
     <link href="~/css/app.css" rel="stylesheet" />
     <div class="generic-container">
         <div class="panel panel-default">
-            <div class="panel-heading"><span class="lead">User Registration Form </span></div>
+            <div class="panel-heading"><span class="lead">User Contact Form </span></div>
             <div class="formcontainer">
                 <form class="form-horizontal" method="post" asp-action="AddUser">
                     <div asp-validation-summary="ModelOnly"></div>
-
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label for="FirstName">FirstName</label>
@@ -26,7 +25,9 @@
 
                     <div class="form-row">
                         <div class="form-group col-md-6">
-                            <label for="EmailAddress">Email</label>
+                            <label for="EmailAddress">
+                                Email
+                            </label>
                             <input asp-for="emailModel.EmailAddress" class="form-control" placeholder="Email Address">
                             <span asp-validation-for="emailModel.EmailAddress" class="text-danger"></span>
                         </div>
@@ -78,12 +79,16 @@
                                 <td><span>@item.UserId</span></td>
                                 <td><span>@item.FirstName</span></td>
                                 <td><span>@item.LastName</span></td>
-                                <td><span>@item.ContactNumber</span></td>
+                                <td>
+                                    <span>@item.ContactNumber</span>
+                                    <a class="btn btn-info custom-width addContact" style="padding:6px 0px" data-id="@item.UserId">Add Contact</a>
+                                </td>
                                 <td><span>@item.Address</span></td>
                                 <td><span>@item.EmailAddress</span></td>
                                 <td>
-                                    <a asp-controller="User" asp-action="Edit" class="btn btn-success custom-width" asp-route-Id="@item.UserId">Edit</a>
-                                    <a asp-controller="User" asp-action="DeleteContact" class="btn btn-danger custom-width" asp-route-Id="@item.UserId">Remove</a>
+                                    <a class="btn btn-info custom-width addEmail" style="padding:6px 0px" data-id="@item.UserId">Add Email</a>
+                                    <a asp-controller="User" asp-action="EditUserContact" class="btn btn-success custom-width" asp-route-Id="@item.UserId">Edit</a>
+                                    <a asp-controller="User" asp-action="DeleteUserContact" class="btn btn-danger custom-width" asp-route-Id="@item.UserId">Remove</a>
                                 </td>
                             </tr>
                         }
@@ -94,8 +99,105 @@
     </div>
 }
 
+<button type="button" style="padding:6px 0px;font-size:9px !important" data-toggle="modal" data-target="#contactModal" data-whatever="getbootstrap" id="btnContactModel"></button>
+<div class="modal fade" id="contactModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">New Contact</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input type="hidden" name="UserId" id="user_Id" />
+                    <div class="form-group">
+                        <label for="ContactNumber" class="col-form-label">Contact No:</label>
+                        <input  type="text"  id="contact_Number" class="form-control" placeholder="Contact No">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary saveContact">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
 
+
+<button type="button" style="padding:6px 0px;font-size:9px !important" data-toggle="modal" data-target="#emailModal" data-whatever="getbootstrap" id="btnEmailModel"></button>
+<div class="modal fade" id="emailModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">New Email</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input type="hidden" name="UserId" id="email_user_Id" />
+                    <div class="form-group">
+                        <label for="email_Address" class="col-form-label">Email Address:</label>
+                        <input type="text" id="email_Address" class="form-control" placeholder="Email Address">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary saveEmail">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery-2.0.3.min.js"></script>
 <script>
+    $(".addContact").click(function () {
+        $("#btnContactModel").trigger("click");
+
+        $('#contact_Number').val("");
+
+        $('#user_Id').val($(this).attr('data-id'));
+    });
+
+    $(".addEmail").click(function () {
+
+        $("#btnEmailModel").trigger("click");
+
+        $('#email_Address').val("");
+        $('#email_user_Id').val($(this).attr('data-id'));
+    });
+
+
+    $(".saveContact").click(function () {
+
+        $.post("User/AddContact", { userId: $('#user_Id').val(), contactNo: $('#contact_Number').val() }, function () {
+            $("#btnContactModel").trigger("click");
+            $('#contact_Number').val("");
+            alert("Contact saved");
+        }).fail(function () {
+            alert("Failed to save contact");
+        });
+
+    });
+
+
+    $(".saveEmail").click(function () {
+
+        $.post("User/AddEmail", { userId: $('#email_user_Id').val(), emailAddress: $('#email_Address').val() }, function () {
+           $('#email_Address').val("");
+            $("#btnEmailModel").trigger("click");
+            alert("Email saved");
+        }).fail(function () {
+            alert("Failed to save email");
+        });
+
+    });
+
     function SearchContact() {
 
         var input, filter, table, tr, td, i, txtValue;

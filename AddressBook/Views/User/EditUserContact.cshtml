@@ -1,0 +1,132 @@
+﻿@model AddressBook.Models.UpdateModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<hr />
+<link href="~/css/app.css" rel="stylesheet" />
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="EditUserContact">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="userModel.UserId" />
+            @foreach (var item in Model.emailModel)
+            {
+                <input type="hidden" asp-for="@item.EmailId" />
+            }
+            @foreach (var item in Model.contactModel)
+            {
+                <input type="hidden" asp-for="@item.ContactId" />
+            }
+
+            <div class="form-group">
+                <label asp-for="userModel.FirstName" class="control-label"></label>
+                <input asp-for="userModel.FirstName" class="form-control" />
+                <span asp-validation-for="userModel.FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="userModel.LastName" class="control-label"></label>
+                <input asp-for="userModel.LastName" class="form-control" />
+                <span asp-validation-for="userModel.LastName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="userModel.Address" class="control-label"></label>
+                <input asp-for="userModel.Address" class="form-control" />
+                <span asp-validation-for="userModel.Address" class="text-danger"></span>
+            </div>
+
+
+            <div class="input-group">
+                <label class="control-label">Contact Number</label>
+                <table id="contactTb" class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th width="30%"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.contactModel)
+                        {
+                            <tr>
+                                <td><input type="text" name="ContactNumber" class="contactNumber @item.ContactId" value="@item.ContactNumber"></td>
+                                <td>
+                                    <a class="updateContact btn btn-success custom-width" data-id="@item.ContactId">Save</a>
+                                </td>
+                            </tr>
+
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="input-group">
+                <label class="control-label">Email Address</label>
+
+                <table id="contactTb" class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th width="30%"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.emailModel)
+                        {
+                            <tr>
+                                <td><input type="text" name="EmailAddress" class="emailAddress @item.EmailId" value="@item.EmailAddress"></td>
+                                <td>
+                                    <a class="updateEmail btn btn-success custom-width" data-Id="@item.EmailId">Save</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+            <br />
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+<script src="~/lib/jquery-2.0.3.min.js"></script>
+<script>
+    $(".updateEmail").click(function () {
+
+        var emailId = $(this).attr('data-id');
+        var emailAddress = $(`.emailAddress.${emailId}`).val();
+        debugger
+        $.post('@Url.Action("UpdateEmail", "User")', { emailId: emailId, emailAddress: emailAddress}, function () {
+            alert("email Updated");
+        }).fail(function () {
+            alert("Failed to save email");
+        });
+
+    });
+
+    $(".updateContact").click(function () {
+
+        var contactId = $(this).attr('data-id');
+        var contactNo = $(`.contactNumber.${contactId}`).val();
+        $.post('@Url.Action("UpdateContact", "User")', { contactId: contactId, contactNo: contactNo }, function () {
+            alert("Contact Updated");
+        }).fail(function () {
+            alert("Failed to save contact");
+        });
+    });
+
+</script>
